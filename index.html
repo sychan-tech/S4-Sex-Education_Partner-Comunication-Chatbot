@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>戀愛求生指南：中學篇</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #fce7f3;
+            /* Halftone comic background */
+            background-image: radial-gradient(#f472b6 1px, transparent 1px);
+            background-size: 15px 15px;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        /* Comic UI Elements */
+        .comic-border {
+            border: 4px solid #111827;
+            box-shadow: 6px 6px 0px #111827;
+            border-radius: 12px;
+            background-color: white;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        
+        .comic-btn:active:not(:disabled) {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px #111827;
+        }
+
+        .comic-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .comic-title {
+            text-shadow: 3px 3px 0px #f472b6, 6px 6px 0px #111827;
+            letter-spacing: 2px;
+        }
+
+        /* Speech Bubbles */
+        .speech-bubble {
+            position: relative;
+            background: #fff;
+            border: 3px solid #000;
+            border-radius: 15px;
+            padding: 15px;
+            font-weight: bold;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+        }
+
+        .speech-bubble.left::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 30px;
+            border-width: 15px 15px 0 0;
+            border-style: solid;
+            border-color: #000 transparent transparent transparent;
+        }
+        .speech-bubble.left::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 32px;
+            border-width: 12px 12px 0 0;
+            border-style: solid;
+            border-color: #fff transparent transparent transparent;
+            z-index: 1;
+        }
+
+        .speech-bubble.right::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            right: 30px;
+            border-width: 15px 0 0 15px;
+            border-style: solid;
+            border-color: #000 transparent transparent transparent;
+        }
+        .speech-bubble.right::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 32px;
+            border-width: 12px 0 0 12px;
+            border-style: solid;
+            border-color: #fff transparent transparent transparent;
+            z-index: 1;
+        }
+
+        /* Animations */
+        @keyframes pulse-mic {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .recording {
+            animation: pulse-mic 1.5s infinite;
+            background-color: #ef4444 !important;
+            color: white !important;
+        }
+
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Progress Bar */
+        .progress-container {
+            border: 3px solid #000;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #e5e7eb;
+            height: 24px;
+        }
+        .progress-bar {
+            height: 100%;
+            transition: width 0.5s ease-in-out, background-color 0.5s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div id="game-container" class="w-full max-w-2xl bg-white comic-border p-4 md:p-6 relative overflow-hidden">
+        
+        <!-- Custom Quit Confirmation Modal (Replacing browser confirm) -->
+        <div id="modal-quit" class="hidden absolute inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+            <div class="bg-white comic-border p-6 max-w-sm w-full text-center">
+                <h3 class="text-xl font-black mb-3 text-red-600"><i class="fa-solid fa-triangle-exclamation"></i> 確定放棄？</h3>
+                <p class="font-bold text-gray-700 mb-6 text-sm">放棄溝通會直接結束遊戲，你確定要離開嗎？</p>
+                <div class="flex gap-3">
+                    <button onclick="confirmQuit()" class="comic-btn bg-red-500 text-white font-black py-2 px-4 flex-1">確定放棄</button>
+                    <button onclick="closeQuitModal()" class="comic-btn bg-gray-200 text-black font-black py-2 px-4 flex-1">繼續遊戲</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 1: MENU ================= -->
+        <div id="screen-menu" class="text-center py-8 fade-in">
+            <h1 class="text-4xl md:text-5xl font-black text-white comic-title mb-6">戀愛求生指南<br><span class="text-2xl md:text-3xl text-yellow-300">中學篇</span></h1>
+            
+            <p class="text-gray-700 font-bold mb-8 bg-yellow-100 p-4 border-2 border-black rounded-lg inline-block shadow-[3px_3px_0px_#000]">
+                <i class="fa-solid fa-bullhorn text-red-500 mr-2"></i>
+                選擇情境，在 5 分鐘內用語音回應伴侶，嘗試達成共識！<br>
+                溝通要有技巧，建立健康關係！
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Scenario 1 Card -->
+                <button onclick="selectScenario(1)" class="comic-btn bg-blue-100 p-5 flex flex-col items-center group relative overflow-hidden">
+                    <div class="text-3xl mb-2">🏀</div>
+                    <h2 class="text-xl font-black mb-2 text-blue-900">情景一：個人空間與陪伴</h2>
+                    <p class="text-sm text-left text-gray-700 font-bold">阿明每逢星期五晚都會同兄弟打波。女友阿婷要求阿明每個星期五晚都要陪她。<br><span class="text-blue-600">扮演：阿明</span></p>
+                </button>
+
+                <!-- Scenario 2 Card -->
+                <button onclick="selectScenario(2)" class="comic-btn bg-pink-100 p-5 flex flex-col items-center group relative overflow-hidden">
+                    <div class="text-3xl mb-2">🏠</div>
+                    <h2 class="text-xl font-black mb-2 text-pink-900">情景二：身體界線與安全</h2>
+                    <p class="text-sm text-left text-gray-700 font-bold">阿俊同阿玲拍拖兩個月。阿俊話屋企無人，邀請阿玲上屋企玩。<br><span class="text-pink-600">扮演：阿玲</span></p>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 2: GAMEPLAY ================= -->
+        <div id="screen-game" class="hidden flex-col h-[600px] fade-in">
+            
+            <!-- Top HUD -->
+            <div class="flex justify-between items-center mb-4 pb-2 border-b-2 border-dashed border-gray-300">
+                <div class="flex items-center gap-2 font-black text-lg">
+                    <i class="fa-solid fa-clock text-red-500"></i>
+                    <span id="timer-display">05:00</span>
+                </div>
+                <div class="flex-1 mx-4">
+                    <div class="text-xs font-bold mb-1 text-center text-gray-600">共識度 (需達 100%)</div>
+                    <div class="progress-container relative">
+                        <div id="consensus-bar" class="progress-bar bg-yellow-400 w-1/2"></div>
+                        <!-- Goal marker -->
+                        <div class="absolute top-0 bottom-0 left-[100%] border-l-2 border-black"></div>
+                    </div>
+                </div>
+                <button onclick="quitGame()" class="comic-btn bg-gray-200 px-3 py-1 text-sm font-bold">
+                    放棄 <i class="fa-solid fa-door-open"></i>
+                </button>
+            </div>
+
+            <!-- Comic Panel Area -->
+            <div class="flex-1 bg-blue-50 border-2 border-black rounded-lg p-4 mb-4 overflow-y-auto flex flex-col gap-4 relative" id="chat-history">
+                
+                <!-- System Intro Bubble -->
+                <div class="text-center w-full mb-2">
+                    <span class="bg-black text-white px-3 py-1 text-xs font-bold rounded">系統提示：遊戲開始！</span>
+                </div>
+
+                <!-- Dialogues will be injected here -->
+            </div>
+
+            <!-- Hint Section (Expandable) -->
+            <div id="hint-box" class="hidden mb-3 bg-yellow-100 border-2 border-black p-3 rounded-lg relative transition-all">
+                <button onclick="toggleHint()" class="absolute -top-3 -right-3 bg-black text-white w-6 h-6 rounded-full flex items-center justify-center font-bold text-sm">X</button>
+                <h3 class="font-black text-yellow-800 mb-1"><i class="fa-solid fa-lightbulb"></i> 正確說話建議：</h3>
+                <ul id="hint-list" class="list-disc pl-5 text-sm font-bold text-gray-800 space-y-1">
+                    <!-- Hints injected here -->
+                </ul>
+            </div>
+
+            <!-- Controls Area -->
+            <div class="bg-gray-100 border-2 border-black rounded-lg p-3">
+                <div class="flex gap-2 items-center">
+                    
+                    <button onclick="toggleHint()" class="comic-btn bg-yellow-300 w-12 h-12 flex items-center justify-center text-xl text-black shrink-0">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </button>
+
+                    <!-- Voice Record Button (Updated to Click-to-Toggle) -->
+                    <button id="record-btn" onclick="toggleRecording()" class="comic-btn bg-green-400 flex-1 h-12 flex items-center justify-center text-black font-black text-base md:text-lg gap-2 relative transition-colors">
+                        <i id="mic-icon" class="fa-solid fa-microphone"></i>
+                        <span id="record-text">撳一下開始說話 (Click to Speak)</span>
+                    </button>
+
+                    <!-- Keyboard Fallback Toggle -->
+                    <button onclick="toggleKeyboard()" class="comic-btn bg-blue-300 w-12 h-12 flex items-center justify-center text-xl text-black shrink-0">
+                        <i class="fa-solid fa-keyboard"></i>
+                    </button>
+                </div>
+
+                <!-- Voice Visualizer Bar -->
+                <div id="mic-visualizer-container" class="hidden mt-2 bg-gray-200 border-2 border-black h-4 rounded-full overflow-hidden relative">
+                    <div id="mic-visualizer-bar" class="bg-red-500 h-full w-0 transition-all duration-75"></div>
+                </div>
+
+                <!-- Text Input Fallback -->
+                <div id="keyboard-input-area" class="hidden mt-3 flex gap-2">
+                    <input type="text" id="text-input" placeholder="如果無法錄音，請在此輸入你的回應..." class="flex-1 border-2 border-black p-2 font-bold focus:outline-none focus:bg-yellow-50 rounded" onkeypress="if(event.key==='Enter') submitText()">
+                    <button onclick="submitText()" class="comic-btn bg-black text-white px-4 font-bold rounded">發送</button>
+                </div>
+                
+                <!-- Status text for speech recognition -->
+                <p id="speech-status" class="text-xs text-center mt-2 font-bold text-gray-500 h-4">點擊麥克風按鈕開始說話</p>
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 3: ENDING ================= -->
+        <div id="screen-result" class="hidden text-center py-8 fade-in">
+            <div id="result-icon" class="text-6xl mb-2">🏆</div>
+            
+            <!-- 新增：星級評分 -->
+            <div id="star-rating" class="text-4xl mb-2 text-yellow-400" style="text-shadow: 2px 2px 0px #000;">
+                ★★★★★
+            </div>
+
+            <h1 id="result-title" class="text-3xl font-black text-black comic-title mb-4">溝通成功！</h1>
+            
+            <div class="bg-white comic-border p-5 text-left mb-6">
+                <h3 class="font-black text-lg mb-2 flex items-center gap-2"><i class="fa-solid fa-book-open text-blue-500"></i> 戀愛教育分析：</h3>
+                <p id="result-analysis" class="text-gray-800 font-bold text-sm leading-relaxed mb-3">
+                    分析內容...
+                </p>
+                <div id="result-tips" class="bg-blue-50 p-3 border-l-4 border-blue-500 text-sm font-bold text-gray-700">
+                    <!-- Dynamic tips -->
+                </div>
+            </div>
+
+            <!-- 新增：溝通技巧評估面板 -->
+            <div class="bg-white comic-border p-5 text-left mb-6">
+                <h3 class="font-black text-lg mb-3 flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-green-500"></i> 你的溝通技巧評估：</h3>
+                <div class="mb-3">
+                    <h4 class="font-bold text-green-600 mb-1"><i class="fa-solid fa-thumbs-up"></i> 做得好的地方：</h4>
+                    <ul id="good-skills-list" class="list-disc pl-5 text-sm font-bold text-gray-700 space-y-1">
+                        <!-- 動態載入好的技巧 -->
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-red-500 mb-1"><i class="fa-solid fa-circle-exclamation"></i> 改善建議：</h4>
+                    <ul id="bad-skills-list" class="list-disc pl-5 text-sm font-bold text-gray-700 space-y-1">
+                        <!-- 動態載入需要改善的技巧 -->
+                    </ul>
+                </div>
+            </div>
+
+            <button onclick="resetGame()" class="comic-btn bg-green-400 px-8 py-3 text-xl font-black w-full">
+                <i class="fa-solid fa-rotate-right mr-2"></i> 再玩一次
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- GAME DATA & SCENARIOS ---
+        
+        // 技巧標籤字典，用於總結畫面
+        const SKILL_TAGS = {
+            'compromise': { type: 'good', text: '主動提出折衷方案 (Win-win)' },
+            'empathy': { type: 'good', text: '表達同理心，理解對方感受' },
+            'boundary': { type: 'good', text: '堅定表達自己的底線，保護自己' },
+            'alternative': { type: 'good', text: '提出安全的替代方案 (如在公開場合見面)' },
+            'aggressive': { type: 'bad', text: '語氣帶有攻擊性或防禦性，容易引發爭吵' },
+            'surrender': { type: 'bad', text: '過度妥協，忽略了自己的需求或安全' },
+            'defend_no_solution': { type: 'bad', text: '只顧解釋自己的原因，沒有嘗試解決雙方問題' },
+            'unclear': { type: 'bad', text: '回應不夠明確，沒有直接回應對方的核心訴求' }
+        };
+
+        const SCENARIOS = {
+            1: {
+                id: 1,
+                playerRole: "阿明",
+                partnerRole: "阿婷",
+                partnerColor: "text-pink-600",
+                partnerBg: "bg-pink-100",
+                playerColor: "text-blue-600",
+                playerBg: "bg-blue-100",
+                avatarHtml: `<div class="w-10 h-10 rounded-full bg-pink-300 border-2 border-black flex items-center justify-center font-bold">婷</div>`,
+                playerAvatarHtml: `<div class="w-10 h-10 rounded-full bg-blue-300 border-2 border-black flex items-center justify-center font-bold">明</div>`,
+                hints: [
+                    "肯定對方：先表達明白佢想見你嘅感受。",
+                    "提出方案：唔好只係拒絕，要提供另一個選擇 (例如星期六、日見)。",
+                    "真誠表達：溫和解釋打波對你減壓有幾重要，但保證佢嘅地位。"
+                ],
+                startLine: "阿明！你又去打波？我哋拍拖之後，你個個星期五晚都同班兄弟去，今晚唔准去，要陪我！",
+                logic: function(text) {
+                    text = text.toLowerCase();
+                    let isCompromise = /星期六|星期日|聽日|另一日|補返|星期[一二三四六日]|放假|食飯|睇戲|晏晝|saturday|sunday|tomorrow|another day|weekend|lunch|dinner|movie/.test(text);
+                    let isEmpathetic = /明白|理解|想見|對唔住|sorry|understand|get it|my bad|apologize/.test(text);
+                    let isSurrender = /好啦|唔去|唔打|陪你|好呀|okay|ok|fine|sure|stay with you|cancel/.test(text) && !isCompromise;
+                    let isAggressive = /分手|煩|兄弟重要|唔得|收皮|嘈|逼我|無理取鬧|break up|annoying|bros over|shut up|no way|crazy/.test(text);
+                    let isDefendingHobby = /減壓|放鬆|應承咗|兄弟|朋友|relax|destress|promised|bros|friends/.test(text);
+                    let isAgreementContinuation = /no problem|sure|ok|okay|沒問題|好呀|好/.test(text);
+
+                    if (this.hasCompromised && isAgreementContinuation) {
+                        return { scoreChange: 20, reply: "好啦，咁我信你啦，聽日見啦！", feedback: "太好啦！你們達成了最終共識，關係更進一步！", tags: ['compromise'] };
+                    }
+
+                    if (isAggressive) {
+                        return { scoreChange: -30, reply: "你竟然咁講嘢？！我只係想你陪下我，你就覺得我煩！", feedback: "態度過於惡劣或充滿防禦性，會破壞雙方感情。", tags: ['aggressive'] };
+                    }
+                    if (isSurrender) {
+                        return { scoreChange: 15, reply: "哼，算你啦。不過你個樣好似好委屈咁...", feedback: "【警告】完全放棄個人愛好來討好對方是不健康的。你應該保有個人空間。", tags: ['surrender'] };
+                    }
+                    if (isCompromise && isEmpathetic) {
+                        this.hasCompromised = true;
+                        return { scoreChange: 60, reply: "咁... 講好咗聽日/星期六全日陪我㗎！達成共識！", feedback: "太好啦！你既表達了理解，又提出了折衷方案，成功達成共識！", tags: ['compromise', 'empathy'] };
+                    }
+                    if (isCompromise) {
+                        this.hasCompromised = true;
+                        return { scoreChange: 60, reply: "嗯... 咁星期六你要帶我去食好嘢！講好了喔！", feedback: "太好啦！你提出了折衷方案，成功達成共識！", tags: ['compromise'] };
+                    }
+                    if (isDefendingHobby && !isCompromise) {
+                        return { scoreChange: -10, reply: "你就淨係顧住打波減壓，咁我呢？", feedback: "解釋原因無錯，但沒有提出解決方案，對方依然會覺得被冷落。", tags: ['defend_no_solution'] };
+                    }
+                    
+                    const unclearReplies = [
+                        "你講咩呀？我唔理，總之你要陪我！",
+                        "我都唔知你想點，總之你今晚唔好去啦！",
+                        "你係咪唔想理我呀？講清楚啲得唔得？"
+                    ];
+                    const randomUnclear = unclearReplies[Math.floor(Math.random() * unclearReplies.length)];
+
+                    return { scoreChange: -5, reply: randomUnclear, feedback: "嘗試提出具體的替代方案（例如其他日子約會）。", tags: ['unclear'] };
+                },
+                winMsg: "你成功與阿婷達成共識！在戀愛中，我們不需要完全放棄自己的興趣和朋友圈，關鍵在於【互相理解】與【尋找折衷方案】。分配好時間，讓對方感受到愛意，同時保有自我。",
+                loseMsg: "溝通失敗！阿婷感到不被重視，或者你因為過度妥協而失去自我。健康的關係需要建立在平等的溝通上，下次嘗試堅定但溫和地表達自己的需求吧。"
+            },
+            2: {
+                id: 2,
+                playerRole: "阿玲",
+                partnerRole: "阿俊",
+                partnerColor: "text-green-600",
+                partnerBg: "bg-green-100",
+                playerColor: "text-pink-600",
+                playerBg: "bg-pink-100",
+                avatarHtml: `<div class="w-10 h-10 rounded-full bg-green-300 border-2 border-black flex items-center justify-center font-bold">俊</div>`,
+                playerAvatarHtml: `<div class="w-10 h-10 rounded-full bg-pink-300 border-2 border-black flex items-center justify-center font-bold">玲</div>`,
+                hints: [
+                    "堅守底線：拍拖初期，避免單獨去對方屋企，保護自己。",
+                    "替代方案：主動提出去公開場合 (例如：戲院、商場、Cafe) 拍拖。",
+                    "直接表達：有禮貌但堅定咁話畀對方知「覺得進展太快 / 唔方便」。"
+                ],
+                startLine: "阿玲呀，今日屋企得我一個，無人喺度呀。不如你上黎我屋企玩啦？我地可以兩個人舒舒服服咁睇戲...",
+                logic: function(text) {
+                    text = text.toLowerCase();
+                    let isSafeAlternative = /出面|街|商場|戲院|cafe|咖啡|公園|餐廳|圖書館|outside|mall|cinema|movie theater|park|restaurant|library/.test(text);
+                    let isSettingBoundary = /唔好|唔方便|太快|下次|驚|安全|出街|唔啦|no|not today|too fast|next time|scared|safe|go out/.test(text);
+                    let isSurrender = /好呀|上黎|ok|無問題|好啦|隨便|去你度|sure|okay|no problem|go to yours|fine/.test(text) && !isSafeAlternative;
+                    let isAggressive = /變態|痴線|報警|分手|有病|pervert|crazy|police|break up|sick/.test(text);
+                    let isAgreementContinuation = /好呀|出發|走啦|去邊|sure|let's go|where/.test(text);
+
+                    if (this.hasSetBoundary && isAgreementContinuation) {
+                        return { scoreChange: 20, reply: "好啦好啦，咁我地而家出發啦！", feedback: "做得好！成功引導對方去安全的地方約會。", tags: ['boundary', 'alternative'] };
+                    }
+
+                    if (isSurrender) {
+                        return { scoreChange: -100, reply: "真係？咁我等你啦...", feedback: "【極度危險】拍拖初期，絕對不應單獨前往對方家中！這會讓自己陷入潛在危機。必須堅定拒絕！", tags: ['surrender'] };
+                    }
+                    if (isAggressive) {
+                        return { scoreChange: -20, reply: "嘩！我淨係想睇戲咋，你諗去邊啊？當我無講過！", feedback: "保護自己是正確的，但過度攻擊性可能會引發不必要的衝突，嘗試溫和但堅定地拒絕。", tags: ['aggressive'] };
+                    }
+                    if (isSettingBoundary && isSafeAlternative) {
+                        this.hasSetBoundary = true;
+                        return { scoreChange: 60, reply: "哦... 咁我都明白嘅。咁我哋出旺角睇戲啦，我去接你！", feedback: "完美！你堅定了自己的身體界線，並提出了安全的公開場合替代方案，成功達成共識！", tags: ['boundary', 'alternative'] };
+                    }
+                    if (isSafeAlternative) {
+                        this.hasSetBoundary = true;
+                        return { scoreChange: 60, reply: "出街？都好呀，咁我哋去公開地方睇戲食飯啦！", feedback: "太好啦！引導對方去安全的公開場合，成功達成共識！", tags: ['alternative'] };
+                    }
+                    if (isSettingBoundary) {
+                        this.hasSetBoundary = true;
+                        return { scoreChange: 30, reply: "唔方便？咁好吧... 咁我哋改日去外面行下啦！", feedback: "成功拒絕了不安全的要求。如果能主動提出具體的公開約會地點，就能更順利達成共識。", tags: ['boundary'] };
+                    }
+
+                    const unclearReplies = [
+                        "咁即係點呀？上唔上黎？",
+                        "你諗成點呀？我等緊你覆架。",
+                        "即係黎定唔黎呀？畀個確切答覆我啦。"
+                    ];
+                    const randomUnclear = unclearReplies[Math.floor(Math.random() * unclearReplies.length)];
+
+                    return { scoreChange: -10, reply: randomUnclear, feedback: "對方似乎聽不明白，請直接拒絕並提出去公開場合。", tags: ['unclear'] };
+                },
+                winMsg: "你成功化解了危機並設定了健康的界線！在戀愛中，務必重視自己的感受和安全感。勇敢拒絕讓你不舒服的要求（如單獨共處一室），主動提出在公開場合約會，是保護自己的最佳方法。",
+                loseMsg: "溝通失敗或陷入危機！請緊記：無論對方多麼親密，只要你覺得進展太快或不安全，都有權利說「不」。愛情不應該建立在妥協自己的安全之上。"
+            }
+        };
+
+        // --- GAME STATE ---
+        let currentScenarioId = 1;
+        let scn = null;
+        let timeLeft = 300; // 5 minutes
+        let timerInterval = null;
+        let consensusScore = 50; // Starts at 50, Goal 100
+        let isRecording = false;
+        let sessionTags = new Set(); // 追蹤玩家這局用的技巧
+
+        // --- SPEECH RECOGNITION SETUP ---
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        let hasSpeechSupport = false;
+        let audioCtx = null;
+        let analyser = null;
+        let micStream = null;
+        let animFrameId = null;
+
+        if (SpeechRecognition) {
+            hasSpeechSupport = true;
+            recognition = new SpeechRecognition();
+            recognition.lang = 'zh-HK'; 
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onstart = function() {
+                isRecording = true;
+                const btn = document.getElementById('record-btn');
+                if (btn) btn.className = "comic-btn bg-red-500 text-white flex-1 h-12 flex items-center justify-center font-black text-base md:text-lg gap-2 relative transition-colors animate-pulse";
+                const icon = document.getElementById('mic-icon');
+                if (icon) icon.className = "fa-solid fa-microphone-lines";
+                const recordText = document.getElementById('record-text');
+                if (recordText) recordText.innerText = "錄音中... 講完再撳一次 (Click to Stop)";
+                
+                const status = document.getElementById('speech-status');
+                if (status) {
+                    status.innerText = "正在聆聽你的聲音...";
+                    status.className = "text-xs text-center mt-2 font-bold text-red-500 h-4";
+                }
+                const viz = document.getElementById('mic-visualizer-container');
+                if (viz) viz.classList.remove('hidden');
+                startMicVisualizer();
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                const status = document.getElementById('speech-status');
+                if (status) {
+                    status.innerText = "辨識成功：" + transcript;
+                    status.className = "text-xs text-center mt-2 font-bold text-green-600 h-4";
+                }
+                stopRecordingUI();
+                handlePlayerInput(transcript);
+            };
+
+            recognition.onerror = function(event) {
+                console.error("Speech error:", event.error);
+                let errorMsg = "錄音出錯，請重試。";
+                if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                    errorMsg = "麥克風權限被拒絕，請在瀏覽器網址列允許使用麥克風。";
+                    document.getElementById('keyboard-input-area').classList.remove('hidden');
+                } else if (event.error === 'no-speech') {
+                    errorMsg = "未偵測到聲音，請重新點擊再試。";
+                } else if (event.error === 'aborted') {
+                    errorMsg = "錄音已取消。";
+                } else {
+                    errorMsg = `麥克風錯誤 (${event.error})，請用鍵盤輸入。`;
+                    document.getElementById('keyboard-input-area').classList.remove('hidden');
+                }
+                
+                const status = document.getElementById('speech-status');
+                if (status) {
+                    status.innerText = errorMsg;
+                    status.className = "text-xs text-center mt-2 font-bold text-gray-600 h-4";
+                }
+                stopRecordingUI();
+            };
+
+            recognition.onend = function() {
+                stopRecordingUI();
+            };
+        } else {
+            console.warn("Speech recognition not supported in this browser.");
+        }
+
+        async function toggleRecording() {
+            if (!hasSpeechSupport) {
+                const status = document.getElementById('speech-status');
+                if (status) status.innerText = "你的瀏覽器暫時不支援語音辨識，請使用文字輸入。";
+                document.getElementById('keyboard-input-area').classList.remove('hidden');
+                return;
+            }
+
+            if (isRecording) {
+                try {
+                    recognition.stop();
+                } catch(e) {}
+                stopRecordingUI();
+            } else {
+                try {
+                    if (!micStream) {
+                        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    }
+                    recognition.start();
+                } catch (err) {
+                    console.error("Microphone access denied:", err);
+                    const status = document.getElementById('speech-status');
+                    if (status) {
+                        status.innerText = "無法存取麥克風，請檢查權限設定，或改用打字輸入。";
+                        status.className = "text-xs text-center mt-2 font-bold text-red-500 h-4";
+                    }
+                    document.getElementById('keyboard-input-area').classList.remove('hidden');
+                }
+            }
+        }
+
+        function startMicVisualizer() {
+            if (!micStream) return;
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const source = audioCtx.createMediaStreamSource(micStream);
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 64;
+                source.connect(analyser);
+
+                const dataArray = new Uint8Array(analyser.frequencyBinCount);
+                const bar = document.getElementById('mic-visualizer-bar');
+
+                function updateVisualizer() {
+                    if (!isRecording) return;
+                    analyser.getByteFrequencyData(dataArray);
+                    let sum = 0;
+                    for (let i = 0; i < dataArray.length; i++) {
+                        sum += dataArray[i];
+                    }
+                    let average = sum / dataArray.length;
+                    let percentage = Math.min(100, Math.max(5, (average / 128) * 100));
+                    if (bar) bar.style.width = percentage + '%';
+                    animFrameId = requestAnimationFrame(updateVisualizer);
+                }
+                updateVisualizer();
+            } catch(e) {
+                console.log("Visualizer failed to start", e);
+            }
+        }
+
+        function stopRecordingUI() {
+            isRecording = false;
+            if (animFrameId) cancelAnimationFrame(animFrameId);
+            
+            const btn = document.getElementById('record-btn');
+            if (btn) {
+                btn.className = "comic-btn bg-green-400 flex-1 h-12 flex items-center justify-center text-black font-black text-base md:text-lg gap-2 relative transition-colors";
+            }
+            const icon = document.getElementById('mic-icon');
+            if (icon) icon.className = "fa-solid fa-microphone";
+            const text = document.getElementById('record-text');
+            if (text) text.innerText = "撳一下開始說話 (Click to Speak)";
+            const viz = document.getElementById('mic-visualizer-container');
+            if (viz) viz.classList.add('hidden');
+        }
+
+        function selectScenario(id) {
+            currentScenarioId = id;
+            scn = SCENARIOS[id];
+            
+            document.getElementById('screen-menu').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('hidden');
+            document.getElementById('screen-game').classList.add('flex');
+            
+            const hintList = document.getElementById('hint-list');
+            hintList.innerHTML = scn.hints.map(h => `<li>${h}</li>`).join('');
+            
+            if (!hasSpeechSupport) {
+                document.getElementById('record-btn').classList.add('hidden');
+                document.getElementById('keyboard-input-area').classList.remove('hidden');
+                document.getElementById('speech-status').innerText = "瀏覽器不支援語音辨識，請使用打字輸入。";
+            }
+
+            startGame();
+        }
+
+        function startGame() {
+            timeLeft = 300;
+            consensusScore = 40;
+            sessionTags.clear();
+            scn.hasCompromised = false;
+            scn.hasSetBoundary = false;
+            updateHUD();
+            document.getElementById('chat-history').innerHTML = 
+                `<div class="text-center w-full mb-2"><span class="bg-black text-white px-3 py-1 text-xs font-bold rounded">系統提示：遊戲開始！你有 5 分鐘。</span></div>`;
+            
+            addChatBubble(scn.partnerRole, scn.startLine, 'left', scn.partnerBg, scn.partnerColor, scn.avatarHtml);
+            
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateHUD();
+                if (timeLeft <= 0) {
+                    endGame(false, "時間到！你們無法達成共識。");
+                }
+            }, 1000);
+        }
+
+        function updateHUD() {
+            let m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            let s = (timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer-display').innerText = `${m}:${s}`;
+            if (timeLeft < 60) document.getElementById('timer-display').classList.add('text-red-600', 'animate-pulse');
+
+            let clampedScore = Math.max(0, Math.min(100, consensusScore));
+            let bar = document.getElementById('consensus-bar');
+            bar.style.width = `${clampedScore}%`;
+            
+            if (clampedScore > 75) bar.className = "progress-bar bg-green-500 w-full";
+            else if (clampedScore > 35) bar.className = "progress-bar bg-yellow-400 w-full";
+            else bar.className = "progress-bar bg-red-500 w-full";
+        }
+
+        function toggleKeyboard() {
+            const kbArea = document.getElementById('keyboard-input-area');
+            kbArea.classList.toggle('hidden');
+        }
+
+        function toggleHint() {
+            const hintBox = document.getElementById('hint-box');
+            hintBox.classList.toggle('hidden');
+        }
+
+        function submitText() {
+            const input = document.getElementById('text-input');
+            const text = input.value.trim();
+            if (text) {
+                handlePlayerInput(text);
+                input.value = '';
+                toggleKeyboard();
+            }
+        }
+
+        function addChatBubble(name, text, side, bgColor, textColor, avatarHtml) {
+            const chat = document.getElementById('chat-history');
+            const isLeft = side === 'left';
+            
+            const html = `
+                <div class="flex flex-col ${isLeft ? 'items-start' : 'items-end'} w-full fade-in mb-2">
+                    <span class="text-xs font-bold text-gray-500 mb-1 px-1">${name}</span>
+                    <div class="flex items-end gap-2 ${isLeft ? 'flex-row' : 'flex-row-reverse'} max-w-[85%]">
+                        ${avatarHtml}
+                        <div class="speech-bubble ${side} ${bgColor} ${textColor} text-sm md:text-base">
+                            ${text}
+                        </div>
+                    </div>
+                </div>
+            `;
+            chat.insertAdjacentHTML('beforeend', html);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function addSystemFeedback(text) {
+            const chat = document.getElementById('chat-history');
+            const html = `
+                <div class="text-center w-full my-2 fade-in">
+                    <span class="bg-yellow-200 border-2 border-black text-black px-3 py-2 text-xs font-bold rounded inline-block shadow-sm">
+                        <i class="fa-solid fa-chalkboard-user text-blue-600 mr-1"></i> ${text}
+                    </span>
+                </div>
+            `;
+            chat.insertAdjacentHTML('beforeend', html);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function handlePlayerInput(text) {
+            addChatBubble(scn.playerRole, text, 'right', scn.playerBg, scn.playerColor, scn.playerAvatarHtml);
+            
+            document.getElementById('record-btn').disabled = true;
+
+            setTimeout(() => {
+                const result = scn.logic(text);
+                
+                if (result.tags) {
+                    result.tags.forEach(tag => sessionTags.add(tag));
+                }
+
+                if (result.feedback) {
+                    addSystemFeedback(result.feedback);
+                }
+
+                setTimeout(() => {
+                    addChatBubble(scn.partnerRole, result.reply, 'left', scn.partnerBg, scn.partnerColor, scn.avatarHtml);
+                    
+                    consensusScore += result.scoreChange;
+                    updateHUD();
+
+                    if (consensusScore >= 100) {
+                        document.getElementById('record-btn').disabled = true;
+                        setTimeout(() => endGame(true, ""), 1500);
+                    } else if (consensusScore <= 0) {
+                        document.getElementById('record-btn').disabled = true;
+                        setTimeout(() => endGame(false, "你們陷入了僵局，關係出現裂痕！"), 1500);
+                    } else {
+                        document.getElementById('record-btn').disabled = false;
+                    }
+                }, 800);
+            }, 400);
+        }
+
+        function quitGame() {
+            document.getElementById('modal-quit').classList.remove('hidden');
+        }
+
+        function closeQuitModal() {
+            document.getElementById('modal-quit').classList.add('hidden');
+        }
+
+        function confirmQuit() {
+            closeQuitModal();
+            endGame(false, "你選擇了逃避溝通。");
+        }
+
+        function endGame(isWin, customMsg) {
+            clearInterval(timerInterval);
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('flex');
+            document.getElementById('screen-result').classList.remove('hidden');
+
+            const title = document.getElementById('result-title');
+            const icon = document.getElementById('result-icon');
+            const analysis = document.getElementById('result-analysis');
+            const tips = document.getElementById('result-tips');
+            const starRating = document.getElementById('star-rating');
+            
+            let stars = 1;
+            if (consensusScore >= 100) stars = 5;
+            else if (consensusScore >= 80) stars = 4;
+            else if (consensusScore >= 50) stars = 3;
+            else if (consensusScore >= 20) stars = 2;
+            else stars = 1;
+
+            starRating.innerHTML = '★'.repeat(stars) + `<span class="text-gray-300">${'★'.repeat(5-stars)}</span>`;
+
+            if (isWin) {
+                title.innerText = "成功達成共識！";
+                title.className = "text-3xl font-black text-green-500 comic-title mb-4";
+                icon.innerText = "💖";
+                analysis.innerText = customMsg || scn.winMsg;
+            } else {
+                title.innerText = "溝通失敗...";
+                title.className = "text-3xl font-black text-red-500 comic-title mb-4";
+                icon.innerText = "💔";
+                analysis.innerText = customMsg + " " + scn.loseMsg;
+            }
+
+            if (currentScenarioId === 1) {
+                tips.innerHTML = "<strong>小總結：</strong>健康戀愛不是24小時黏在一起，而是互相尊重對方的生活圈子。遇到衝突時，提出「折衷方案 (Win-win)」比單方面妥協或爭吵更有效。";
+            } else {
+                tips.innerHTML = "<strong>小總結：</strong>保護自己永遠排在第一位。覺得唔舒服、進展太快時，必須直接拒絕。愛你的人會尊重你的界線，不會勉強你。";
+            }
+
+            const goodList = document.getElementById('good-skills-list');
+            const badList = document.getElementById('bad-skills-list');
+            goodList.innerHTML = '';
+            badList.innerHTML = '';
+
+            let hasGood = false;
+            let hasBad = false;
+
+            sessionTags.forEach(tag => {
+                if (SKILL_TAGS[tag]) {
+                    const skill = SKILL_TAGS[tag];
+                    if (skill.type === 'good') {
+                        goodList.innerHTML += `<li>${skill.text}</li>`;
+                        hasGood = true;
+                    } else if (skill.type === 'bad') {
+                        badList.innerHTML += `<li>${skill.text}</li>`;
+                        hasBad = true;
+                    }
+                }
+            });
+
+            if (!hasGood) goodList.innerHTML = `<li class="text-gray-500 font-normal">這次未有明顯展現，下次可嘗試多用同理心及提出具體建議。</li>`;
+            if (!hasBad && isWin) badList.innerHTML = `<li class="text-green-600 font-normal">表現非常好！沒有發現明顯的不良溝通習慣。</li>`;
+            else if (!hasBad) badList.innerHTML = `<li class="text-gray-500 font-normal">未能成功達成共識，可能需要更直接地表達你的想法。</li>`;
+        }
+
+        function resetGame() {
+            document.getElementById('screen-result').classList.add('hidden');
+            document.getElementById('screen-menu').classList.remove('hidden');
+            document.getElementById('timer-display').classList.remove('text-red-600', 'animate-pulse');
+            document.getElementById('keyboard-input-area').classList.add('hidden');
+            document.getElementById('hint-box').classList.add('hidden');
+            const status = document.getElementById('speech-status');
+            if (status) status.innerText = "準備就緒";
+        }
+    </script>
+</body>
+</html>
